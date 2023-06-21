@@ -1,0 +1,124 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <style>
+    body {
+      min-width: 600px; /* Adjust the minimum width of the body */
+      max-width: 1000px; /* Adjust the maximum width of the body */
+      height: 800px;
+      margin: 0 auto;
+    }
+    h2 {
+      font-family: Arial;
+      font-size: 2.5rem;
+      text-align: center;
+    }
+    .chart-container {
+      width: 50%;
+      float: left;
+      height: 400px;
+    }
+    .chart-border {
+      border: 2px solid #333333;
+      border-radius: 10px;
+      background-color: #f5f5f5;
+      padding: 20px; /* Adjust the padding around the charts */
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .content {
+        background-color: white;
+        text-align: left;
+        margin: 0 20px;
+        border-radius: 10px;
+        padding: 20px;
+    }
+    .fire-box {
+      background-color: #00FF00;
+    }
+  </style>
+</head>
+<body>
+  <h2>Project thực hành Lab5_6</h2>
+  <div class="chart-border">
+    <div id="chart-temperature" class="chart-container"></div>
+    <div id="chart-gas" class="chart-container"></div>
+  </div>
+  <div class="content">
+    <h3>Giảng viên: Nguyễn Duy Xuân Bách</h3>
+    <h3>Sinh viên thực hiện: </h3>
+
+    <ul>
+        <li>Lê Hoàng Thịnh _ 20521959</li>
+        <li>Hà Vĩnh Kiện _ 20520597</li>
+    </ul>
+  </div>
+  <script>
+    var chartT = new Highcharts.Chart({
+      chart: {
+        renderTo: 'chart-temperature',
+        type: 'line',
+        animation: false
+      },
+      title: { text: 'Temperature' },
+      series: [{ name: 'Temperature', data: [], color: '#FF0000' }],
+      plotOptions: {
+        line: { animation: false, dataLabels: { enabled: true } }
+      },
+      xAxis: {
+        type: 'datetime',
+        dateTimeLabelFormats: { second: '%H:%M:%S' }
+      },
+      yAxis: {
+        title: { text: 'Temperature (Celsius)' }
+      },
+      credits: { enabled: false }
+    });
+
+    var chartG = new Highcharts.Chart({
+      chart: {
+        renderTo: 'chart-gas',
+        type: 'line',
+        animation: false
+      },
+      title: { text: 'Gas' },
+      series: [{ name: 'Gas', data: [], color: '#00FF00' }],
+      plotOptions: {
+        line: { animation: false, dataLabels: { enabled: true } }
+      },
+      xAxis: {
+        type: 'datetime',
+        dateTimeLabelFormats: { second: '%H:%M:%S' }
+      },
+      yAxis: {
+        title: { text: 'Gas' }
+      },
+      credits: { enabled: false }
+    });
+
+
+    var startTime = Date.now();
+
+    setInterval(function () {
+        $.getJSON('/api/data', function (data) {
+            var currentTime = Date.now() - startTime;
+            var temperature = parseFloat(data.temperature);
+            var gas = parseFloat(data.gas);
+            
+            if (chartT.series[0].data.length > 40) {
+                chartT.series[0].addPoint([currentTime, temperature], true, true, true);
+                chartG.series[0].addPoint([currentTime, gas], true, true, true);
+            } else {
+                chartT.series[0].addPoint([currentTime, temperature], true, false, true);
+                chartG.series[0].addPoint([currentTime, gas], true, false, true);
+            }
+
+        });
+    }, 10000);
+
+  </script>
+</body>
+</html>
